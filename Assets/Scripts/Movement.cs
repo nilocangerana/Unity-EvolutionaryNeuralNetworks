@@ -23,7 +23,6 @@ public class Movement : MonoBehaviour
             return;
 
         float[] commands = neuralNetwork.GenerateOutput();
-        /////Debug.Log(transform.tag+ "["+commands[0]+ ", " + commands[1]+ "] lenght: "+commands.Length);
         translation = commands[0];
         rotation = commands[1];
 

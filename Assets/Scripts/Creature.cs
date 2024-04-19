@@ -8,6 +8,11 @@ public class Creature : MonoBehaviour
     private float currentLifeTime;
     private float timerCount=0f;
 
+    private int score=0;
+    public int Score{
+        get{return score;}
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,38 +33,68 @@ public class Creature : MonoBehaviour
         }
 
         if(currentLifeTime<=0f){
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            gameObject.SetActive(false);
+            if(transform.tag=="Herb") {
+                SceneController.instance.DecrementHerbPopulation();
+            } else {
+                SceneController.instance.DecrementCarnPopulation();
+            }
         }
     }
 
     public void AddLifeTime()
     {
-        Debug.Log("added +1 lifetime to "+transform.tag);
         currentLifeTime++;
     }
 
     public void ReduceLifeTime()
     {
-        Debug.Log("reduced -1 lifetime to "+transform.tag);
         currentLifeTime--;
         if(currentLifeTime<=0f){
-            Destroy(gameObject);
+            //Destroy(gameObject);
+            gameObject.SetActive(false);
+            SceneController.instance.DecrementCarnPopulation();
+        }
+    }
+
+    private void AddScore(int amount)
+    {
+        score+=amount;
+    }
+
+    private void ReduceScore(int amount)
+    {
+        score-=amount;
+        if(score<0){
+            score=0;
         }
     }
 
     void OnCollisionEnter2D(Collision2D col) {
         if(transform.tag=="Herb" && col.gameObject.tag=="Food") {
             AddLifeTime();
+            AddScore(2);
             Destroy(col.gameObject);
+            SceneController.instance.DecrementFoodCount();
         } else if(transform.tag=="Carn" && col.gameObject.tag=="Herb") {
             AddLifeTime();
-            Destroy(col.gameObject);
+            AddScore(2);
+            col.gameObject.SetActive(false);
+            SceneController.instance.UpdateHerbPopulation();
+            //Destroy(col.gameObject);
         } else if(transform.tag=="Herb" && col.gameObject.tag=="Carn") {
             col.transform.GetComponent<Creature>().AddLifeTime();
-            Destroy(transform.gameObject);
+            col.transform.GetComponent<Creature>().AddScore(1);
+            ReduceScore(1);
+            gameObject.SetActive(false);
+            SceneController.instance.UpdateHerbPopulation();
+            //Destroy(transform.gameObject);
         } else if(transform.tag=="Carn" && col.gameObject.tag=="Food") {
             ReduceLifeTime();
+            ReduceScore(1);
             Destroy(col.gameObject);
+            SceneController.instance.DecrementFoodCount();
         }
     }
 

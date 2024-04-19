@@ -31,6 +31,14 @@ public class NetworkLayer
         }
     }
 
+    public void SetWeightValue(float v, int widx){
+        weights[widx]=v;
+    }
+
+    public void SetBiasValue(float v, int bidx){
+        biases[bidx]=v;
+    }
+
     private float ReluActivationFunction(float value, float b) {
         if(value<=b) {
             return 0f;
@@ -43,10 +51,17 @@ public class NetworkLayer
         if(value<=b) {
             return 0f;
         } else {
-            if(value>0f) {
+            /*if(value>0f) {
                 return 1f;
             } else {
                 return -1f;
+            }*/
+            if(value>1f) {
+                return 1f;
+            } else if(value<-1){
+                return -1f;
+            } else {
+                return value;
             }
         }
     }
@@ -66,10 +81,6 @@ public class NetworkLayer
                     output = ReluActivationFunction(total, biases[biasIndex]);
                 }
                 layerOutputs[biasIndex] = output;
-                //Debug.Log("lastlayer?: "+lastLayer+"   "+layerOutputs[biasIndex]+"  bidx"+biasIndex);
-                total=0f;
-                i=0;
-                biasIndex++;
                 return layerOutputs;
             }
 
